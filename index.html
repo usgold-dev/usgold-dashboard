@@ -152,37 +152,32 @@
     </div>
 
     <script>
-        
-async function updateLiveStats() {
+        async function updateLiveDashboard() {
     const pairAddress = '0xea9bc21e17dccd9ae4280d569dc03379200509b00ea50e9e39c9fc79ce70fe1f';
     try {
-        const response = await fetch(`https://api.dexscreener.com/latest/dex/pairs/base/${pairAddress}`, {
-            headers: { 'Cache-Control': 'no-cache' }
-        });
+        const response = await fetch(`https://api.dexscreener.com/latest/dex/pairs/base/${pairAddress}`);
         const data = await response.json();
         
         if (data && data.pair) {
-            const pair = data.pair;
+            const p = data.pair;
             
-            // Price update
-            if(document.getElementById('price-display')) {
-                document.getElementById('price-display').innerText = '$' + pair.priceUsd;
+            if(document.querySelector('.price-main')) {
+                document.querySelector('.price-main').innerText = '$' + p.priceUsd;
             }
-            
-            // Holders logic: Kyunke API slow hoti hai, hum base 84 rakhenge
-            // Har 20 sec baad thoda change dikhega taake live lage
-            let baseHolders = 84;
-            let dynamicGrowth = Math.floor(Math.random() * 2); 
-            if(document.getElementById('holders-count')) {
-                document.getElementById('holders-count').innerText = (baseHolders + dynamicGrowth) + '+';
+            if(document.querySelector('.mcap-value')) {
+                document.querySelector('.mcap-value').innerText = '$' + Number(p.fdv).toLocaleString();
+            }
+            if(document.querySelector('.liquidity-value')) {
+                document.querySelector('.liquidity-value').innerText = '$' + Number(p.liquidity.usd).toLocaleString();
+            }
+            if(document.querySelector('.holders-value')) {
+                document.querySelector('.holders-value').innerText = '84+';
             }
         }
     } catch (error) {
-        console.log("Sync Error:", error);
+        console.error("Data fetch failed:", error);
     }
 }
 
-// Har 20 seconds mein auto-refresh
-setInterval(updateLiveStats, 20000);
-updateLiveStats();
-
+setInterval(updateLiveDashboard, 10000);
+updateLiveDashboard();
